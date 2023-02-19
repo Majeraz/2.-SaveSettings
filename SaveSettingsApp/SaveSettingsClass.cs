@@ -7,32 +7,46 @@ using System.Threading.Tasks;
 namespace SaveSettingsApp {
 	public static class SaveSettingsClass {
 
-		private static string dllFolderPath;
 		private static string settingsFolderName;
 		private static string settingsJSONFileName;
+
+		private static string dllFolderFullPath;
+		private static string settingsFileFullPath;
+		private static string settingsFolderFullPath;
 
 		public static void SaveSettings() {
 			// Set up your files names
 			settingsFolderName = "Settings";
 			settingsJSONFileName = "settings.json";
 
-			GetThisDllFolderPath(typeof(SaveSettingsClass));
-			CreateFolderAndJSONFileIfDontExist();
+			GetAllPaths(typeof(SaveSettingsClass));
+			if(!SettingsJSONFileExists())
+				CreateSettingsFolderAndJSONFile();
+			// Override JSON file
 
 		}
 
-		private static string GetThisDllFolderPath(Type typeOfThisClass) {
-			dllFolderPath = Path.GetDirectoryName(typeOfThisClass.Assembly.Location)!;
-			return dllFolderPath;
+		private static bool SettingsJSONFileExists() {
+			if(File.Exists(settingsFileFullPath))
+				return true;
+			return false;
 		}
-		private static void CreateFolderAndJSONFileIfDontExist() {
+
+		/// <summary>
+		/// Get paths to: dll, settings folder, settingsJSON file
+		/// </summary>
+		/// <param name="typeOfThisClass"></param>
+		/// <returns></returns>
+		private static string GetAllPaths(Type typeOfThisClass) {
+			dllFolderFullPath = Path.GetDirectoryName(typeOfThisClass.Assembly.Location)!;
 			// Variable for checking existence, eventually creating, the settings JSON file
-			string settingsFileFullPath = Path.Combine(dllFolderPath, settingsFolderName, settingsJSONFileName);
+			settingsFileFullPath = Path.Combine(dllFolderFullPath, settingsFolderName, settingsJSONFileName);
 			// Variable for method for create folder at desired name
-			string settingsFolderFullPath = Path.Combine(dllFolderPath, settingsFolderName);
-
-			if(!File.Exists(settingsFileFullPath)) { // if settings file doesn't exist...
-													 // Create directory but if doesn't exist do nothing
+			settingsFolderFullPath = Path.Combine(dllFolderFullPath, settingsFolderName);
+			return dllFolderFullPath;
+		}
+		private static void CreateSettingsFolderAndJSONFile() {
+				// Create directory but if exists do nothing
 				Directory.CreateDirectory(settingsFolderFullPath);
 				// Create JSON settings file
 				File.Create(settingsFileFullPath);
