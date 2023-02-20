@@ -51,12 +51,12 @@ namespace SaveSettingsApp {
 		}
 
 		private static void Cut2FirstCharactersFromSerializedObject(ref string serializedObject) {
-			serializedObject = serializedObject.Remove(0,1).Insert(0,",");
+			serializedObject = serializedObject.Remove(0, 5).Insert(0, Environment.NewLine).Insert(0, ",");
 		}
 
 		private static void Cut2LastCharactersFromJSONFile(string jSONFilePath) {
 			using(FileStream fs = File.OpenWrite(jSONFilePath)) {
-				fs.SetLength(fs.Seek(-1, SeekOrigin.End));
+				fs.SetLength(fs.Seek(-3, SeekOrigin.End));
 			}
 		}
 

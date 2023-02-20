@@ -4,11 +4,11 @@ using SaveSettingsApp;
 using SaveSettingsApp._1._KindsOfSettings;
 
 GeneralSetting gs = new("settingName3AsNotIEnumerable");
-List<GeneralSetting> geneeralSettingList= new() {
+List<GeneralSetting> generalSettingList= new() {
 	 new("settingName1"),
 	 new("settingName2")
 };
-SaveSettingsClass.SaveSettings(gs);
+SaveSettingsClass.SaveSettings(generalSettingList);
 
 
 
