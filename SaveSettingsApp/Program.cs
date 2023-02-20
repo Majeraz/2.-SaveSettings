@@ -1,8 +1,14 @@
 ﻿
 
 using SaveSettingsApp;
+using SaveSettingsApp._1._KindsOfSettings;
 
-SaveSettingsClass.SaveSettings();
+GeneralSetting gs = new("settingName3AsNotIEnumerable");
+List<GeneralSetting> geneeralSettingList= new() {
+	 new("settingName1"),
+	 new("settingName2")
+};
+SaveSettingsClass.SaveSettings(gs);
 
 
 
