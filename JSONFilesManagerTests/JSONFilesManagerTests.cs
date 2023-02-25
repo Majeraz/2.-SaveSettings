@@ -25,7 +25,7 @@ public class JSONFilesManagerTests {
 	[TestMethod()]
 	public void CreateJSONFileTest_CreateAllDirectoriesAndAddFileAndAddContent_BasingOnlyOnFullFilePath() {
 		if(Directory.Exists(JSONFileDirectory)) {
-			foreach(string i in Directory.GetFiles(JSONFileDirectory)){
+			foreach(string i in Directory.GetFiles(JSONFileDirectory)) {
 				File.Delete(i);
 			}
 			Directory.Delete(JSONFileDirectory);
@@ -45,5 +45,10 @@ public class JSONFilesManagerTests {
 		}
 		string JSONFullFilePath = JSONFilesManager.CreateJSONFile<JSONFilesManagerTests>(generalSettingList, JSONFileRealiveDirectory, JSONFileName);
 		Assert.IsTrue(File.Exists(JSONFullFilePath));
+	}
+
+	[TestMethod()]
+	public void AppendJSONFileTest() {
+
 	}
 }

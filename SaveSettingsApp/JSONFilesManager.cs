@@ -65,7 +65,8 @@ namespace SaveSettingsApp {
 
 
 		/// <summary>
-		/// Creates or rewrites a JSONFile, and creates directories realtive to dll location of class passed as generic type
+		/// Creates or rewrites a JSONFile of specified name and at relative,
+		/// to dll directory (of class passed as generic type), location. It creates necessary directories and files if they are not exist and write passed object into it.
 		/// </summary>
 		/// <param name="objectToBeWritten"></param>
 		/// <param name="JSONFileRealiveDirectory"></param>
@@ -77,6 +78,13 @@ namespace SaveSettingsApp {
 			AppendJSONFileAboutAnSerializedObject(JSONFullFilePath, objectToBeWritten);
 			return JSONFullFilePath;
 		}
+		/// <summary>
+		/// Creates or rewrites a JSONFile basing on passed file path. It creates necessary directories and files if they are not exist and write passed object into it.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="objectToBeWritten"></param>
+		/// <param name="JSONFullFilePath"></param>
+		/// <returns></returns>
 		public static string CreateJSONFile<T>(object objectToBeWritten, string JSONFullFilePath) {
 			GetJSONFileAndItsDirectory(typeof(T), JSONFullFilePath);
 			using(File.Create(JSONFullFilePath));
