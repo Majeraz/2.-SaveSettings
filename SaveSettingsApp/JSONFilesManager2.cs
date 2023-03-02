@@ -42,7 +42,7 @@ public class JSONFilesManager2 {
 			objectList.AddRange((List<ObjectType>)objectToBeWritten);	// If it is list of objects, then add its range
 		}
 		string serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(objectList, Newtonsoft.Json.Formatting.Indented);
-		File.AppendAllText(JSONFullFilePath, serializedObject);
+		File.WriteAllText(JSONFullFilePath, serializedObject);
 	}
 
 	public static List<ObjectType> DeserializeJSON<ObjectType>(string JSONFileRelativePath) {
