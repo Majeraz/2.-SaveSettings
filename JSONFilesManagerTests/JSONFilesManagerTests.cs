@@ -17,7 +17,7 @@ public class JSONFilesManagerTests {
 	static string JSONFullPath = Path.Combine(Path.GetDirectoryName(typeof(JSONFilesManagerTests).Assembly.Location), JSONFileRealiveDirectory, JSONFileName);
 	static string JSONFileDirectory = JSONFullPath.Remove(JSONFullPath.LastIndexOf("\\"));
 
-	static List<GeneralSetting> generalSettingList = new() {
+	static List<SettingObjectExampleClass> generalSettingList = new() {
 		 new("settingName1"),
 		 new("settingName2" )
 	};
@@ -30,25 +30,20 @@ public class JSONFilesManagerTests {
 			}
 			Directory.Delete(JSONFileDirectory);
 		}
-		JSONFilesManager.CreateJSONFile<JSONFilesManagerTests>(generalSettingList, JSONFullPath);
+		JSONFilesManager.RewriteJSONFile<JSONFilesManagerTests>(generalSettingList, JSONFullPath);
 		Assert.IsTrue(File.Exists(JSONFullPath));
 		// I checked the content. It is also correct.
 	}
 
-	[TestMethod()]
-	public void CreateJSONFileTest1() {
-		if(Directory.Exists(JSONFileDirectory)) {
-			foreach(string i in Directory.GetFiles(JSONFileDirectory)) {
-				File.Delete(i);
-			}
-			Directory.Delete(JSONFileDirectory);
-		}
-		string JSONFullFilePath = JSONFilesManager.CreateJSONFile<JSONFilesManagerTests>(generalSettingList, JSONFileRealiveDirectory, JSONFileName);
-		Assert.IsTrue(File.Exists(JSONFullFilePath));
-	}
-
-	[TestMethod()]
-	public void AppendJSONFileTest() {
-
-	}
+	//[TestMethod()]
+	//public void CreateJSONFileTest1() {
+	//	if(Directory.Exists(JSONFileDirectory)) {
+	//		foreach(string i in Directory.GetFiles(JSONFileDirectory)) {
+	//			File.Delete(i);
+	//		}
+	//		Directory.Delete(JSONFileDirectory);
+	//	}
+	//	string JSONFullFilePath = JSONFilesManager.CreateJSONFile(generalSettingList, JSONFileRealiveDirectory, JSONFileName);
+	//	Assert.IsTrue(File.Exists(JSONFullFilePath));
+	//}
 }

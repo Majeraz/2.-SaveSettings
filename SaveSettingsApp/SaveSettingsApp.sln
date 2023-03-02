@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSONFilesManager", "JSONFilesManager.csproj", "{EB0276C2-42B4-4975-AE70-8724BCA7B5B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSONFilesManagerProj", "JSONFilesManagerProj.csproj", "{EB0276C2-42B4-4975-AE70-8724BCA7B5B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONFilesManagerTests", "..\JSONFilesManagerTests\JSONFilesManagerTests.csproj", "{7B176857-3A2C-4398-AE4B-78CB42DB0AA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSONFilesManagerTests", "..\JSONFilesManagerTests\JSONFilesManagerTests.csproj", "{7B176857-3A2C-4398-AE4B-78CB42DB0AA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

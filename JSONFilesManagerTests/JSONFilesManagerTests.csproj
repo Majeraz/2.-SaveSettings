@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SaveSettingsApp\JSONFilesManager.csproj" />
+    <ProjectReference Include="..\SaveSettingsApp\JSONFilesManagerProj.csproj" />
   </ItemGroup>
 
 </Project>

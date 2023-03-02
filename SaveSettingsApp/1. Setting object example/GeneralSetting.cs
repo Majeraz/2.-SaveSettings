@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SaveSettingsApp._1._KindsOfSettings {
-	public class GeneralSetting {
-		public GeneralSetting(string settingName) {
+	public class SettingObjectExampleClass {
+		public SettingObjectExampleClass(string settingName) {
 			SettingName = settingName;
 		}
 		public string SettingName { get; set; }

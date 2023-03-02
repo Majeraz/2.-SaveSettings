@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Reflection;
+using Project_Asistent_v1._1._2._CS._5._Settings;
 
 namespace SaveSettingsApp {
 	public static class JSONFilesManager {
@@ -15,7 +17,7 @@ namespace SaveSettingsApp {
 		/// </summary>
 		public static string JSONFileName = "settings.json";
 		public static string JSONFileRealiveDirectory = "Settings\\lala\\lala2\\";
-		public static string JSONFullPath = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), JSONFileRealiveDirectory, JSONFileName);
+		public static string JSONFullPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), JSONFileRealiveDirectory, JSONFileName);
 		public static string JSONFileDirectory = JSONFullPath.Remove(JSONFullPath.LastIndexOf("\\"));
 
 		/// <summary>
@@ -24,19 +26,19 @@ namespace SaveSettingsApp {
 		/// <typeparam name="T"></typeparam>
 		/// <param name="JSONFilePath"></param>
 		/// <returns></returns>
-		public static List<T> GetJSONFileAsAnGenericList<T>(string JSONFilePath) {
-			return DeserializeObject<T>(JSONFilePath);
-		}
+		//public static List<T> GetJSONFileAsAnGenericList<T>(string JSONFilePath) {
+		//	return DeserializeObject<T>(JSONFilePath);
+		//}
 		/// <summary>
 		/// Returns a list of specific objects, of a JSON file
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="JSONFilePath"></param>
 		/// <returns></returns>
-		public static List<T> GetJSONFileAsAnGenericList<T>(string JSONFileRealiveDirectory, string JSONFileName) {
-			string dllFolderFullPath = Path.GetDirectoryName(typeof(T).Assembly.Location)!;
+		public static List<SettingsTestClass> GetJSONFileAsAnGenericList(string JSONFileRealiveDirectory, string JSONFileName) {
+			string dllFolderFullPath = Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))!;
 			string JSONFileFullPath = Path.Combine(dllFolderFullPath, JSONFileRealiveDirectory, JSONFileName);
-			return DeserializeObject<T>(JSONFileFullPath);
+			return DeserializeObject(JSONFileFullPath);
 		}
 
 
@@ -50,19 +52,6 @@ namespace SaveSettingsApp {
 		public static void AppendJSONFile(object appendingObject, string JSONFullFilePath) {
 			AppendJSONFileAboutAnSerializedObject(JSONFullFilePath, appendingObject);
 		}
-		/// <summary>
-		/// Append list<T> independently if an appending object is T or list<T>
-		/// </summary>
-		/// <param name="appendingObject"></param>
-		/// <param name="JSONFileRealiveDirectory"></param>
-		/// <param name="JSONFileName"></param>
-		/// <returns></returns>
-		public static string AppendJSONFile(object appendingObject, string JSONFileRealiveDirectory, string JSONFileName) {
-			string JSONFullFilePath = GetJSONFileAndItsDirectory(typeof(JSONFilesManager), JSONFileRealiveDirectory, JSONFileName);
-			AppendJSONFileAboutAnSerializedObject(JSONFullFilePath, appendingObject);
-			return JSONFullFilePath;
-		}
-
 
 		/// <summary>
 		/// Creates or rewrites a JSONFile of specified name and at relative,
@@ -72,8 +61,8 @@ namespace SaveSettingsApp {
 		/// <param name="JSONFileRealiveDirectory"></param>
 		/// <param name="JSONFileName"></param>
 		/// <returns></returns>
-		public static string CreateJSONFile<T>(object objectToBeWritten, string JSONFileRealiveDirectory, string JSONFileName) {
-			string JSONFullFilePath = GetJSONFileAndItsDirectory(typeof(T), JSONFileRealiveDirectory, JSONFileName);
+		public static string RewriteJSONFile(object objectToBeWritten, string JSONFileRealiveDirectory, string JSONFileName) {
+			string JSONFullFilePath = GetJSONFullFilePathAndCreateItsDirectory(JSONFileRealiveDirectory, JSONFileName);
 			using(File.Create(JSONFullFilePath)) ;
 			AppendJSONFileAboutAnSerializedObject(JSONFullFilePath, objectToBeWritten);
 			return JSONFullFilePath;
@@ -85,7 +74,7 @@ namespace SaveSettingsApp {
 		/// <param name="objectToBeWritten"></param>
 		/// <param name="JSONFullFilePath"></param>
 		/// <returns></returns>
-		public static string CreateJSONFile<T>(object objectToBeWritten, string JSONFullFilePath) {
+		public static string RewriteJSONFile<T>(object objectToBeWritten, string JSONFullFilePath) {
 			GetJSONFileAndItsDirectory(typeof(T), JSONFullFilePath);
 			using(File.Create(JSONFullFilePath));
 			AppendJSONFileAboutAnSerializedObject(JSONFullFilePath, objectToBeWritten);
@@ -93,7 +82,9 @@ namespace SaveSettingsApp {
 		}
 
 
-		private static void AppendJSONFileAboutAnSerializedObject(string JSONFilePath, object objectToBeWritten ) {
+
+
+		private static void AppendJSONFileAboutAnSerializedObject(string JSONFullFilePath, object objectToBeWritten ) {
 			Action AppendJSONFile;
 			if(objectToBeWritten is not IEnumerable<object>) {
 				objectToBeWritten = new List<object>() {	// Convert to an IEnumerable object
@@ -101,14 +92,14 @@ namespace SaveSettingsApp {
 				};
 			}
 			string serializedObject = SerializeObject(objectToBeWritten);
-			using(FileStream fs = File.OpenRead(JSONFilePath)) {
+			using(FileStream fs = File.OpenRead(JSONFullFilePath)) {
 				if(fs.Length == 0) {
-					AppendJSONFile = () => { File.AppendAllText(JSONFilePath, serializedObject); };
+					AppendJSONFile = () => { File.AppendAllText(JSONFullFilePath, serializedObject); };
 				} else {
 					AppendJSONFile = () => {
-						Cut2LastCharactersFromJSONFile(JSONFilePath);
+						Cut2LastCharactersFromJSONFile(JSONFullFilePath);
 						Cut2FirstCharactersFromSerializedObject(ref serializedObject);
-						File.AppendAllText(JSONFilePath, serializedObject);
+						File.AppendAllText(JSONFullFilePath, serializedObject);
 					};
 				}
 			}
@@ -127,8 +118,8 @@ namespace SaveSettingsApp {
 		/// If file doesn't exist then create it and its directory, returns JSONFileFullPath
 		/// </summary>
 		/// <param name="JSONFilePath"></param>
-		private static string GetJSONFileAndItsDirectory(Type typeOfThisClass, string JSONFileRealiveDirectory, string JSONFileName) {
-			string dllFolderFullPath = Path.GetDirectoryName(typeOfThisClass.Assembly.Location)!;
+		private static string GetJSONFullFilePathAndCreateItsDirectory(string JSONFileRealiveDirectory, string JSONFileName) {
+			string dllFolderFullPath = Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))!;
 			string JSONFileFullPath = Path.Combine(dllFolderFullPath, JSONFileRealiveDirectory, JSONFileName);
 			Directory.CreateDirectory(Path.Combine(dllFolderFullPath, JSONFileRealiveDirectory));
 			if(!File.Exists(JSONFileFullPath)) {
@@ -154,9 +145,9 @@ namespace SaveSettingsApp {
 			string myJSONString = Newtonsoft.Json.JsonConvert.SerializeObject(someObject, Newtonsoft.Json.Formatting.Indented);
 			return myJSONString;
 		}
-		private static List<T> DeserializeObject<T>(string JSONFilePath) {
+		private static List<SettingsTestClass> DeserializeObject(string JSONFilePath) {
 			string deserializedJSON = File.ReadAllText(JSONFilePath);
-			List<T> objectList = JsonSerializer.Deserialize<List<T>>(deserializedJSON);
+			List<SettingsTestClass> objectList = JsonSerializer.Deserialize<List<SettingsTestClass>>(deserializedJSON);
 			return objectList;
 		}
 	}
