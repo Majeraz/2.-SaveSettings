@@ -9,7 +9,7 @@ using SaveSettingsApp;
 
 namespace JSONFilesManagerProj;
 /// <summary>
-/// Get acces to JSON File at sprecified related file path (if it doesn't exist yet it is beeing created).
+/// Get acces to JSON File at specified related file path (if it doesn't exist yet it is beeing created).
 /// Gives methods to manipulate settings files.
 /// </summary>
 /// <typeparam name="ObjectType"></typeparam>
@@ -34,6 +34,11 @@ public class SettingsManager<ObjectType> {
 		JSONFilesManager2.AddObjectToJSON<ObjectType>(JSONFileRelativePath, objectToBeWritten);
 		return true;
 	}
+
+	/// <summary>
+	/// Reads JSON file and save it as List<T>
+	/// </summary>
+	/// <returns>List<T></returns>
 	public List<ObjectType> GetSettings() {
 		return (List<ObjectType>)JSONFilesManager2.DeserializeJSON<ObjectType>(JSONFileRelativePath);
 	}

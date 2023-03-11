@@ -48,6 +48,9 @@ public class JSONFilesManager2 {
 	public static List<ObjectType> DeserializeJSON<ObjectType>(string JSONFileRelativePath) {
 		List<ObjectType> objectList = new();
 		string JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), JSONFileRelativePath);
+		if(!File.Exists(JSONFullFilePath)) {
+			return objectList;
+		}
 		string deserializedJSON = File.ReadAllText(JSONFullFilePath);
 			if(deserializedJSON.Length > 0) {
 			objectList = JsonSerializer.Deserialize<List<ObjectType>>(deserializedJSON);
