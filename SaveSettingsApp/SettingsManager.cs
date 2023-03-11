@@ -20,7 +20,7 @@ public class SettingsManager<ObjectType> {
 	}
 
 	/// <summary>
-	/// Creates JSON file that contains object of specified type. It can be either object or List<object>
+	/// Creates or extend JSON file about list<T> or T.
 	/// </summary>
 	/// <exception cref="NotImplementedException"></exception>
 	public bool AddSetting(object objectToBeWritten) {
