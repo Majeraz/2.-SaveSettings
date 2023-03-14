@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Project_Asistent_v1._1._2._CS._5._Settings;
@@ -15,15 +16,18 @@ namespace JSONFilesManagerProj;
 /// <typeparam name="ObjectType"></typeparam>
 public class SettingsManager<ObjectType> {
 	private string JSONFileRelativePath;
+	private string JSONFullFilePath;
 	public SettingsManager(string JSONFileRelativePath) {
 		this.JSONFileRelativePath = JSONFileRelativePath;
-	}
+        JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), JSONFileRelativePath);
 
-	/// <summary>
-	/// Creates or extend JSON file about list<T> or T.
-	/// </summary>
-	/// <exception cref="NotImplementedException"></exception>
-	public bool AddSetting(object objectToBeWritten) {
+    }
+
+    /// <summary>
+    /// Creates or extend JSON file about list<T> or T.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public bool AddSetting(object objectToBeWritten) {
 		if(objectToBeWritten is IEnumerable<object>){
 			if(objectToBeWritten.GetType().GetGenericArguments().Single() != typeof(ObjectType))
 				return false;
@@ -33,6 +37,10 @@ public class SettingsManager<ObjectType> {
 		}
 		JSONFilesManager2.AddObjectToJSON<ObjectType>(JSONFileRelativePath, objectToBeWritten);
 		return true;
+	}
+	public void UpdateSetting(object objectToBeWritten) {
+		File.Delete(JSONFullFilePath);
+		AddSetting(objectToBeWritten);
 	}
 
 	/// <summary>
