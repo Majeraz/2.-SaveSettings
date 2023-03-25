@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,35 +9,20 @@ using System.Threading.Tasks;
 using Project_Asistent_v1._1._2._CS._5._Settings;
 
 namespace JSONFilesManagerProj;
-public class JSONFilesManager2 {
-	#region Private methods
-	private static void Cut2FirstCharactersFromSerializedObject(ref string serializedObject) {
-		serializedObject = serializedObject.Remove(0, 5).Insert(0, Environment.NewLine).Insert(0, ",");
-	}
-	private static void Cut2LastCharactersFromJSONFile(string jSONFilePath) {
-		using(FileStream fs = File.OpenWrite(jSONFilePath)) {
-			fs.SetLength(fs.Seek(-3, SeekOrigin.End));
-		}
-	}
-	#endregion
-
-	#region Public methods
-	/// <summary>
-	/// Creates JSON file and its directory if they not exist. If they exist, method just returns fullJSONFilePath.
-	/// </summary>
-	/// <param name="JSONFileName"></param>
-	/// <param name="JSONFileRealiveDirectory"></param>
-	/// <returns></returns>
+/// <summary>
+/// Creates JSON file and operate on it
+/// </summary>
+public static class JSONFilesManager2 {
 
 	/// <summary>
-	/// Add object or List<object> to JSON.
+	/// Get JSON file at specified path, deserialize it, extend and save again as List of T.
 	/// </summary>
-	/// <param name="JSONFullFilePath"></param>
+	/// <typeparam name="ObjectType"></typeparam>
+	/// <param name="JSONFileFullPath"></param>
 	/// <param name="objectToBeWritten"></param>
-	public static void AddObjectToJSON<ObjectType>(string JSONFileRelativePath, object objectToBeWritten){
-		string JSONFullFilePath = CreateJSONFileAndItsDirectory(JSONFileRelativePath);
-		List<ObjectType> objectList = DeserializeJSON<ObjectType>(JSONFileRelativePath);	// Deserialize current JSONFile
-		if(objectToBeWritten is not IEnumerable<object>) {
+	public static void AddObjectToListOfObjectsInJSONFile<ObjectType>(string JSONFullFilePath, object objectToBeWritten){
+		dynamic objectList = (DeserializeJSON<ObjectType>(JSONFullFilePath) as IEnumerable)!;	// Deserialize current JSONFile to extend it later
+		if(!objectToBeWritten.GetType().GetInterfaces().Contains(typeof(IEnumerable))) {	// check if object to be written is enumerable
 			objectList.Add((ObjectType)objectToBeWritten);	// If it is just a single object, then add it
 		} else {
 			objectList.AddRange((List<ObjectType>)objectToBeWritten);	// If it is list of objects, then add its range
@@ -44,30 +30,38 @@ public class JSONFilesManager2 {
 		string serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(objectList, Newtonsoft.Json.Formatting.Indented);
 		File.WriteAllText(JSONFullFilePath, serializedObject);
 	}
+	/// <summary>
+	/// Serialize object and write it to JSON file at specified path
+	/// </summary>
+	/// <param name="JSONFileFullPath"></param>
+	/// <param name="objectToBeWritten"></param>
+	public static void WriteObjectToJSONFile(string JSONFileFullPath, object objectToBeWritten) {
+		string serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(objectToBeWritten, Newtonsoft.Json.Formatting.Indented);
+		File.WriteAllText(JSONFileFullPath, serializedObject);
+    }
 
-	public static List<ObjectType> DeserializeJSON<ObjectType>(string JSONFileRelativePath) {
-		List<ObjectType> objectList = new();
-		string JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), JSONFileRelativePath);
-		if(!File.Exists(JSONFullFilePath)) {
-			return objectList;
+
+	/// <summary>
+	/// If JSON is empty then returns an empty object. Otherwise it returns deserialized JSON as object
+	/// </summary>
+	/// <typeparam name="ObjectType"></typeparam>
+	/// <param name="JSONFullFilePath"></param>
+	/// <returns></returns>
+	public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath){
+        string deserializedJSON = File.ReadAllText(JSONFullFilePath);
+		if(deserializedJSON.Length > 0)
+			return JsonSerializer.Deserialize<ObjectType>(deserializedJSON)!;
+        return (ObjectType)Activator.CreateInstance<ObjectType>();
+    }
+
+	/// <summary>
+	/// Creates JSON file and its directory if they are not exist.
+	/// </summary>
+	/// <param name="JSONFullFilePath"></param>
+	public static void CreateJSONFileAndItsDirectory(string JSONFullFilePath) {
+		Directory.CreateDirectory(Path.GetDirectoryName(JSONFullFilePath)!);	//Creates directory if not exist
+		if(!File.Exists(JSONFullFilePath)) {	// Check if file already exists
+			using(FileStream fs = File.Create(JSONFullFilePath));	 // If doesn't exist then create the file
 		}
-		string deserializedJSON = File.ReadAllText(JSONFullFilePath);
-			if(deserializedJSON.Length > 0) {
-			objectList = JsonSerializer.Deserialize<List<ObjectType>>(deserializedJSON);
-		}
-		return objectList;
 	}
-
-	private static string CreateJSONFileAndItsDirectory(string JSONFileRelativePath) {
-		string JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), JSONFileRelativePath);
-		Directory.CreateDirectory(JSONFullFilePath.Remove(JSONFullFilePath.LastIndexOf("\\")));
-		if(!File.Exists(JSONFullFilePath)) {
-			// Create JSON settings file
-			using(FileStream fs = File.Create(JSONFullFilePath)) ;
-		}
-		return JSONFullFilePath;
-	}
-	#endregion
-
-
 }

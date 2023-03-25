@@ -9,46 +9,42 @@ using Project_Asistent_v1._1._2._CS._5._Settings;
 using SaveSettingsApp;
 
 namespace JSONFilesManagerProj;
+
 /// <summary>
-/// Get acces to JSON File at specified related file path (if it doesn't exist yet it is beeing created).
+/// Get acces to JSON File at specified related file path (if it doesn't exist yet it is becoming created).
 /// Gives methods to manipulate settings files.
 /// </summary>
-/// <typeparam name="ObjectType"></typeparam>
+/// <typeparam name="ObjectType">Type of stored object in JSON file</typeparam>
 public class SettingsManager<ObjectType> {
-	private string JSONFileRelativePath;
 	private string JSONFullFilePath;
+	private bool ifJSONShouldBeIEnumerable = false;
 	public SettingsManager(string JSONFileRelativePath) {
-		this.JSONFileRelativePath = JSONFileRelativePath;
-        JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), JSONFileRelativePath);
-
+        if (typeof(ObjectType).GetInterfaces().Contains(typeof(IEnumerable))) ifJSONShouldBeIEnumerable = true;
+        JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, JSONFileRelativePath);
+        JSONFilesManager2.CreateJSONFileAndItsDirectory(JSONFullFilePath);
+    }
+	public void AddObjectToJSONFile(object objectToBeWritten) {
+        if (ifJSONShouldBeIEnumerable)
+            if (objectToBeWritten.GetType() != typeof(ObjectType))   // if type of file that is supposed to be added to JSON doesn't match type that is placed in JSON 
+                throw new Exception("Type of the object doesn't match JSON type");
+        else
+            JSONFilesManager2.WriteObjectToJSONFile(JSONFullFilePath, objectToBeWritten);
+	}
+	/// <summary>
+	/// Deletes JSON file and then rewrite it about new object. Always store full object before use this method.
+	/// </summary>
+	/// <param name="objectToBeWritten"></param>
+	public void RewriteSetting(object objectToBeWritten) {
+		File.WriteAllText(JSONFullFilePath, "");	// Clear the file
+		AddObjectToJSONFile(objectToBeWritten);
+	}
+    public ObjectType GetSetting() {
+        return JSONFilesManager2.DeserializeJSON<ObjectType>(JSONFullFilePath);
     }
 
     /// <summary>
-    /// Creates or extend JSON file about list<T> or T.
+    /// Extends JSON file about list of T or T.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public bool AddSetting(object objectToBeWritten) {
-		if(objectToBeWritten is IEnumerable<object>){
-			if(objectToBeWritten.GetType().GetGenericArguments().Single() != typeof(ObjectType))
-				return false;
-		} else {
-			if(objectToBeWritten.GetType() != typeof(ObjectType))
-				return false;
-		}
-		JSONFilesManager2.AddObjectToJSON<ObjectType>(JSONFileRelativePath, objectToBeWritten);
-		return true;
-	}
-	public void UpdateSetting(object objectToBeWritten) {
-		File.Delete(JSONFullFilePath);
-		AddSetting(objectToBeWritten);
-	}
-
-	/// <summary>
-	/// Reads JSON file and save it as List<T>
-	/// </summary>
-	/// <returns>List<T></returns>
-	public List<ObjectType> GetSettings() {
-		return (List<ObjectType>)JSONFilesManager2.DeserializeJSON<ObjectType>(JSONFileRelativePath);
-	}
-
+    /// <param name="objectToBeWritten"></param>
+    /// <returns></returns>
 }
