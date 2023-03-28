@@ -17,18 +17,14 @@ namespace JSONFilesManagerProj;
 /// <typeparam name="ObjectType">Type of stored object in JSON file</typeparam>
 public class SettingsManager<ObjectType> {
 	private string JSONFullFilePath;
-	private bool ifJSONShouldBeIEnumerable = false;
 	public SettingsManager(string JSONFileRelativePath) {
-        if (typeof(ObjectType).GetInterfaces().Contains(typeof(IEnumerable))) ifJSONShouldBeIEnumerable = true;
         JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, JSONFileRelativePath);
         JSONFilesManager2.CreateJSONFileAndItsDirectory(JSONFullFilePath);
     }
 	public void AddObjectToJSONFile(object objectToBeWritten) {
-        if (ifJSONShouldBeIEnumerable)
-            if (objectToBeWritten.GetType() != typeof(ObjectType))   // if type of file that is supposed to be added to JSON doesn't match type that is placed in JSON 
+        if (objectToBeWritten.GetType() != typeof(ObjectType))   // if type of file that is supposed to be added to JSON doesn't match type that is placed in JSON 
                 throw new Exception("Type of the object doesn't match JSON type");
-        else
-            JSONFilesManager2.WriteObjectToJSONFile(JSONFullFilePath, objectToBeWritten);
+        JSONFilesManager2.WriteObjectToJSONFile(JSONFullFilePath, objectToBeWritten);
 	}
 	/// <summary>
 	/// Deletes JSON file and then rewrite it about new object. Always store full object before use this method.
