@@ -17,11 +17,15 @@ namespace JSONFilesManagerProj;
 /// <typeparam name="ObjectType">Type of stored object in JSON file</typeparam>
 public class SettingsManager<ObjectType> {
 	private string JSONFullFilePath;
-	public SettingsManager(string JSONFileRelativePath) {
+    private ObjectType referenceToTheOriginalObject;
+    public SettingsManager(string JSONFileRelativePath, ref ObjectType originalObject) {
         JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, JSONFileRelativePath);
         JSONFilesManager2.CreateJSONFileAndItsDirectory(JSONFullFilePath);
+        referenceToTheOriginalObject = GetSetting();
+        originalObject = referenceToTheOriginalObject!;
     }
-	public void AddObjectToJSONFile(object objectToBeWritten) {
+
+    public void AddObjectToJSONFile(object objectToBeWritten) {
         if (objectToBeWritten.GetType() != typeof(ObjectType))   // if type of file that is supposed to be added to JSON doesn't match type that is placed in JSON 
                 throw new Exception("Type of the object doesn't match JSON type");
         JSONFilesManager2.WriteObjectToJSONFile(JSONFullFilePath, objectToBeWritten);
@@ -30,10 +34,13 @@ public class SettingsManager<ObjectType> {
 	/// Deletes JSON file and then rewrite it about new object. Always store full object before use this method. It can be used for initialize new JSON file.
 	/// </summary>
 	/// <param name="objectToBeWritten"></param>
-	public void RewriteSetting(object objectToBeWritten) {
+	public void RewriteSetting() {
 		File.WriteAllText(JSONFullFilePath, "");	// Clear the file
-		AddObjectToJSONFile(objectToBeWritten);
+		AddObjectToJSONFile(referenceToTheOriginalObject);
 	}
+    /// <summary>
+    /// Sore JSON file in reference referenceToTheOriginalObject 
+    /// </summary>
     public ObjectType GetSetting() {
         return JSONFilesManager2.DeserializeJSON<ObjectType>(JSONFullFilePath);
     }

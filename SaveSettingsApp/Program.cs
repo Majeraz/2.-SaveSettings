@@ -16,6 +16,6 @@ List<string> myStringList = new() {
 };
 
 
-SettingsManager<string> settingManager = new(JSONFileRelativePath);
-settingManager.AddObjectToJSONFile(myStringList);
+//SettingsManager<List<string>> settingManager = new(JSONFileRelativePath, myStringList);
+//settingManager.AddObjectToJSONFile(myStringList);
 //settingManager.GetSettings();
