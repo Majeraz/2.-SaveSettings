@@ -31,7 +31,7 @@ public class SettingsManager<ObjectType> {
         JSONFilesManager2.WriteObjectToJSONFile(JSONFullFilePath, objectToBeWritten);
 	}
 	/// <summary>
-	/// Deletes JSON file and then rewrite it about new object. Always store full object before use this method. It can be used for initialize new JSON file.
+	/// Udates JSON file for the object associated with this SettingsManager object. It can be used for initialize new JSON file.
 	/// </summary>
 	/// <param name="objectToBeWritten"></param>
 	public void RewriteSetting() {

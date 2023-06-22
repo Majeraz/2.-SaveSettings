@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Project_Asistent_v1._1._2._CS._5._Settings;
 
 namespace JSONFilesManagerProj;
@@ -49,8 +50,9 @@ public static class JSONFilesManager2 {
 	/// <returns></returns>
 	public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath){
         string deserializedJSON = File.ReadAllText(JSONFullFilePath);
-		if(deserializedJSON.Length > 0)
-			return JsonSerializer.Deserialize<ObjectType>(deserializedJSON)!;
+		if (deserializedJSON.Length > 0) {
+            return JsonConvert.DeserializeObject<ObjectType>(deserializedJSON)!;
+        }
         return (ObjectType)Activator.CreateInstance<ObjectType>();
     }
 
