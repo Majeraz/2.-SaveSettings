@@ -39,7 +39,7 @@ public class SettingsManager<ObjectType> {
 		AddObjectToJSONFile(referenceToTheOriginalObject);
 	}
     /// <summary>
-    /// Sore JSON file in reference referenceToTheOriginalObject 
+    /// Store JSON file in reference referenceToTheOriginalObject 
     /// </summary>
     public ObjectType GetSetting() {
         return JSONFilesManager2.DeserializeJSON<ObjectType>(JSONFullFilePath);
