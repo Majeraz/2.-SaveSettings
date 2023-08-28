@@ -7,30 +7,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Project_Asistent_v1._1._2._CS._5._Settings;
 
 namespace JSONFilesManagerProj;
 /// <summary>
 /// Creates JSON file and operate on it
 /// </summary>
-public static class JSONFilesManager2 {
+public static class JSONFilesManager {
 
-	/// <summary>
-	/// Get JSON file at specified path, deserialize it, extend and save again as List of T.
-	/// </summary>
-	/// <typeparam name="ObjectType"></typeparam>
-	/// <param name="JSONFileFullPath"></param>
-	/// <param name="objectToBeWritten"></param>
-	public static void AddObjectToListOfObjectsInJSONFile<ObjectType>(string JSONFullFilePath, object objectToBeWritten){
-		dynamic objectList = (DeserializeJSON<ObjectType>(JSONFullFilePath) as IEnumerable)!;	// Deserialize current JSONFile to extend it later
-		if(!objectToBeWritten.GetType().GetInterfaces().Contains(typeof(IEnumerable))) {	// check if object to be written is enumerable
-			objectList.Add((ObjectType)objectToBeWritten);	// If it is just a single object, then add it
-		} else {
-			objectList.AddRange((List<ObjectType>)objectToBeWritten);	// If it is list of objects, then add its range
-		}
-		string serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(objectList, Newtonsoft.Json.Formatting.Indented);
-		File.WriteAllText(JSONFullFilePath, serializedObject);
-	}
+
 	/// <summary>
 	/// Serialize object and write it to JSON file at specified path
 	/// </summary>
@@ -48,7 +32,7 @@ public static class JSONFilesManager2 {
 	/// <typeparam name="ObjectType"></typeparam>
 	/// <param name="JSONFullFilePath"></param>
 	/// <returns></returns>
-	public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath){
+	public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath) {
         string deserializedJSON = File.ReadAllText(JSONFullFilePath);
 		if (deserializedJSON.Length > 0) {
             return JsonConvert.DeserializeObject<ObjectType>(deserializedJSON)!;

@@ -1,7 +1,6 @@
 ﻿using JSONFilesManagerProj;
-using Project_Asistent_v1._1._2._CS._5._Settings;
-using SaveSettingsApp;
-using SaveSettingsApp._1._KindsOfSettings;
+
+
 
 // Files examples 
 string JSONFileRelativeDirectoryPath= "Settings\\";
