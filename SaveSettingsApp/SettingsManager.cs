@@ -43,7 +43,7 @@ public class SettingsManager<ObjectType> {
 		AddObjectToJSONFile(referenceToTheOriginalObject!);
 	}
     /// <summary>
-    /// Store JSON file in reference referenceToTheOriginalObject 
+    /// Store JSON file in reference referenceToTheOriginalObject (load settings)
     /// </summary>
     public ObjectType GetSetting() {
         JSONCustomConverter JSONCustomConverterObject = new();
