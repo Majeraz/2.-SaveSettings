@@ -47,7 +47,7 @@ public static class JSONFilesManager {
 	public static void CreateJSONFileAndItsDirectory(string JSONFullFilePath) {
 		Directory.CreateDirectory(Path.GetDirectoryName(JSONFullFilePath)!);	//Creates directory if not exist
 		if(!File.Exists(JSONFullFilePath)) {	// Check if file already exists
-			using(FileStream fs = File.Create(JSONFullFilePath));	 // If doesn't exist then create the file
+			File.Create(JSONFullFilePath);	 // If doesn't exist then create the file
 		}
 	}
 }

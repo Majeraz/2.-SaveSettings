@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
-using Project_Asistent_v1._1._2._CS._3._Converters;
 
 namespace JSONFilesManagerProj;
 
@@ -24,9 +23,6 @@ public class SettingsManager<ObjectType> {
         JSONFilesManager.CreateJSONFileAndItsDirectory(JSONFullFilePath);
         referenceToTheOriginalObject = GetSetting();
         originalObject = referenceToTheOriginalObject!;
-    }
-    public SettingsManager() {
-
     }
 
     public void AddObjectToJSONFile(object objectToBeWritten) {
@@ -46,7 +42,6 @@ public class SettingsManager<ObjectType> {
     /// Store JSON file in reference referenceToTheOriginalObject (load settings)
     /// </summary>
     public ObjectType GetSetting() {
-        JSONCustomConverter JSONCustomConverterObject = new();
         object deserializedJSON = JSONFilesManager.DeserializeJSON<ObjectType>(JSONFullFilePath)!;
         return (ObjectType)deserializedJSON;
     }
