@@ -3,7 +3,7 @@
 
 
 // Files examples 
-string JSONFileRelativeDirectoryPath= "Settings\\"; // Define a relative directory of the *.json file
+string JSONFileRelativeDirectoryPath = "Settings\\"; // Define a relative directory of the *.json file
 string JSONFileRelativePath = JSONFileRelativeDirectoryPath + "testSetting.json";   // Define a name for the file
 
 // DEBUG TO SEE HOW IT WORKS
