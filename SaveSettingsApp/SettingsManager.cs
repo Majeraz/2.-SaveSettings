@@ -10,11 +10,11 @@ namespace JSONFilesManagerProj;
 public class SettingsManager<ObjectType> {
     private string JSONFullFilePath;
     private ObjectType referenceToTheOriginalObject;
-    public SettingsManager(string JSONFileRelativePath, ref ObjectType originalObject) {
+    public SettingsManager(string JSONFileRelativePath, ref ObjectType? originalObject) {
         JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, JSONFileRelativePath);
         JSONFilesManager.CreateJSONFileAndItsDirectory(JSONFullFilePath);
-        referenceToTheOriginalObject = GetSetting();
-        originalObject = referenceToTheOriginalObject!;
+        originalObject = GetSetting();
+        referenceToTheOriginalObject = originalObject;
     }
 
     public void AddObjectToJSONFile(object objectToBeWritten) {
@@ -33,7 +33,7 @@ public class SettingsManager<ObjectType> {
     /// <summary>
     /// Store JSON file in reference referenceToTheOriginalObject (load settings)
     /// </summary>
-    public ObjectType GetSetting() {
+    private ObjectType GetSetting() {
         object deserializedJSON = JSONFilesManager.DeserializeJSON<ObjectType>(JSONFullFilePath)!;
         return (ObjectType)deserializedJSON;
     }
