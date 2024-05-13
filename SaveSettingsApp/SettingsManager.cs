@@ -8,7 +8,7 @@ namespace JSONFilesManagerProj;
 /// </summary>
 /// <typeparam name="ObjectType">Type of stored object in JSON file</typeparam>
 public class SettingsManager<ObjectType> {
-    private string JSONFullFilePath;
+    public string JSONFullFilePath;
     private ObjectType referenceToTheOriginalObject;
     public SettingsManager(string JSONFileRelativePath, ref ObjectType? originalObject) {
         JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, JSONFileRelativePath);
