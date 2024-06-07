@@ -1,6 +1,7 @@
-﻿using System.Reflection;
+﻿using JSONFilesManagerProj;
+using System.Reflection;
 
-namespace JSONFilesManagerProj;
+namespace SaveSettingsProject;
 
 /// <summary>
 /// Get acces to JSON File at specified related file path (if it doesn't exist yet it is becoming created).

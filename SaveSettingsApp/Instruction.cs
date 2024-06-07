@@ -1,9 +1,8 @@
-﻿using JSONFilesManagerProj;
+﻿using SaveSettingsProject;
 
 
 internal class Instruction {
-    public Instruction()
-    {
+    public Instruction() {
         // Files examples 
         string JSONFileRelativeDirectoryPath = "Settings\\"; // Define a relative directory of the *.json file
         string JSONFileRelativePath = JSONFileRelativeDirectoryPath + "testSetting.json";   // Define a name for the file
