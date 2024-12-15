@@ -13,7 +13,10 @@ public static class JSONFilesManager {
     /// <param name="JSONFileFullPath"></param>
     /// <param name="objectToBeWritten"></param>
     public static void WriteObjectToJSONFile(string JSONFileFullPath, object objectToBeWritten) {
-        string serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(objectToBeWritten, Newtonsoft.Json.Formatting.Indented);
+        JsonSerializerSettings settings = new() {
+            TypeNameHandling = TypeNameHandling.All
+        };
+        string serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(objectToBeWritten, Newtonsoft.Json.Formatting.Indented, settings);
         File.WriteAllText(JSONFileFullPath, serializedObject);
     }
 
@@ -27,7 +30,10 @@ public static class JSONFilesManager {
     public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath) {
         string deserializedJSON = File.ReadAllText(JSONFullFilePath);
         if (deserializedJSON.Length > 0) {
-            return JsonConvert.DeserializeObject<ObjectType>(deserializedJSON)!;
+            JsonSerializerSettings settings = new(){
+                TypeNameHandling = TypeNameHandling.All
+            };
+            return JsonConvert.DeserializeObject<ObjectType>(deserializedJSON, settings)!;
         }
         return (ObjectType)Activator.CreateInstance<ObjectType>();
     }
