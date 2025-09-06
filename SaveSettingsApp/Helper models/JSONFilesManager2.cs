@@ -30,7 +30,7 @@ public static class JSONFilesManager {
     public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath) {
         string deserializedJSON = File.ReadAllText(JSONFullFilePath);
         if (deserializedJSON.Length > 0) {
-            JsonSerializerSettings settings = new(){
+            JsonSerializerSettings settings = new() {
                 TypeNameHandling = TypeNameHandling.All
             };
             return JsonConvert.DeserializeObject<ObjectType>(deserializedJSON, settings)!;
