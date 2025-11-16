@@ -12,7 +12,7 @@ public class SettingsManager<ObjectType> {
     public string JSONFullFilePath;
     private ObjectType referenceToTheOriginalObject;
     public SettingsManager(string JSONFileRelativePath, ref ObjectType? originalObject) {
-        JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, JSONFileRelativePath);
+        JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName)!, JSONFileRelativePath);
         JSONFilesManager.CreateJSONFileAndItsDirectory(JSONFullFilePath);
         originalObject = GetSetting();
         referenceToTheOriginalObject = originalObject;
