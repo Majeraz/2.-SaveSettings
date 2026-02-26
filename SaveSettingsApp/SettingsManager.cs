@@ -1,5 +1,7 @@
 ﻿using JSONFilesManagerProj;
 using System.Reflection;
+using System.IO;
+
 
 namespace SaveSettingsProject;
 
@@ -12,7 +14,19 @@ public class SettingsManager<ObjectType> {
     public string JSONFullFilePath;
     private ObjectType referenceToTheOriginalObject;
     public SettingsManager(string JSONFileRelativePath, ref ObjectType? originalObject) {
-        JSONFullFilePath = Path.Combine(Path.GetDirectoryName(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName)!, JSONFileRelativePath);
+        string appDataRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DXFManager");
+        Directory.CreateDirectory(appDataRoot);
+
+        JSONFullFilePath = Path.Combine(appDataRoot, JSONFileRelativePath);
+
+        string previousBasePath = Path.GetDirectoryName(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName)!;
+        string previousFullPath = Path.Combine(previousBasePath, JSONFileRelativePath);
+
+        if (!File.Exists(JSONFullFilePath) && File.Exists(previousFullPath)) {
+            Directory.CreateDirectory(Path.GetDirectoryName(JSONFullFilePath)!);
+            File.Copy(previousFullPath, JSONFullFilePath, overwrite: true);
+        }
+
         JSONFilesManager.CreateJSONFileAndItsDirectory(JSONFullFilePath);
         originalObject = GetSetting();
         referenceToTheOriginalObject = originalObject;
