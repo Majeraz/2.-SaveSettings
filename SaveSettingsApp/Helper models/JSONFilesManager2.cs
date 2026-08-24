@@ -6,6 +6,17 @@ namespace JSONFilesManagerProj;
 /// </summary>
 public static class JSONFilesManager {
 
+    /// <summary>
+    /// [Przenosiny typow 2026-08-24] JEDNO wspolne zrodlo ustawien serializera (wczesniej 3 kopie inline).
+    /// TypeNameHandling.All jak dotad + <see cref="AssemblyAgnosticSerializationBinder"/>: odczyt znajduje
+    /// typ po pelnej nazwie takze wtedy, gdy klasa przeniosla sie do innej biblioteki (ekstrakcja E2:
+    /// "UserModel, DXF Manager" -> assembly DXFManagerBackend). Bez bindera taki plik = "uszkodzony"
+    /// i reset ustawien u kazdego klienta po aktualizacji. Zapis dostaje AKTUALNE nazwy assembly.
+    /// </summary>
+    private static JsonSerializerSettings CreateSerializerSettings() => new() {
+        TypeNameHandling = TypeNameHandling.All,
+        SerializationBinder = new AssemblyAgnosticSerializationBinder(),
+    };
 
     /// <summary>
     /// Serialize object and write it to JSON file at specified path.
@@ -23,9 +34,7 @@ public static class JSONFilesManager {
     /// <param name="JSONFileFullPath"></param>
     /// <param name="objectToBeWritten"></param>
     public static void WriteObjectToJSONFile(string JSONFileFullPath, object objectToBeWritten) {
-        JsonSerializerSettings settings = new() {
-            TypeNameHandling = TypeNameHandling.All
-        };
+        JsonSerializerSettings settings = CreateSerializerSettings();
         // Serializacja PRZED dotknieciem pliku: gdy rzuci (np. cykl referencji), na dysku zostaje
         // nietknieta poprzednia wersja ustawien zamiast pustki.
         string serializedObject = JsonConvert.SerializeObject(objectToBeWritten, Formatting.Indented, settings);
@@ -88,9 +97,7 @@ public static class JSONFilesManager {
     public static ObjectType DeserializeJSON<ObjectType>(string JSONFullFilePath) {
         string deserializedJSON = File.ReadAllText(JSONFullFilePath);
         if (deserializedJSON.Length > 0) {
-            JsonSerializerSettings settings = new() {
-                TypeNameHandling = TypeNameHandling.All
-            };
+            JsonSerializerSettings settings = CreateSerializerSettings();
             return JsonConvert.DeserializeObject<ObjectType>(deserializedJSON, settings)!;
         }
         return (ObjectType)Activator.CreateInstance<ObjectType>();
@@ -126,9 +133,7 @@ public static class JSONFilesManager {
         }
 
         try {
-            JsonSerializerSettings settings = new() {
-                TypeNameHandling = TypeNameHandling.All
-            };
+            JsonSerializerSettings settings = CreateSerializerSettings();
             var deserialized = JsonConvert.DeserializeObject<ObjectType>(raw, settings);
             if (deserialized is null) {
                 failureReason = "deserializacja zwrocila null";
