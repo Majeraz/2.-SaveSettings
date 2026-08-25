@@ -1,4 +1,4 @@
-using JSONFilesManagerProj;
+﻿using JSONFilesManagerProj;
 using System.Reflection;
 using System.IO;
 
@@ -94,8 +94,20 @@ public class SettingsManager<ObjectType> {
         LoadOutcome = mainFileExisted ? SettingsLoadOutcome.DefaultsAfterLoss : SettingsLoadOutcome.FreshDefaults;
         LoadFailureReason = mainFailure;
 
-        JSONFilesManager.CreateJSONFileAndItsDirectory(JSONFullFilePath);
-        return Activator.CreateInstance<ObjectType>();
+        // [Falszywy alarm 2026-08-24, wdrozenie tenant 77] Dawne CreateJSONFileAndItsDirectory zostawialo tu
+        // PUSTY plik (0 bajtow). Przy NASTEPNYM starcie plik "istnial, ale byl pusty" -> DefaultsAfterLoss,
+        // czyli telemetria krzyczala "user stracil konfiguracje" przy KAZDEJ swiezej instalacji (raz), a pusty
+        // plik na dysku byl stanem posrednim, ktory kazdy odczyt traktuje jak awarie. Teraz od razu zapisujemy
+        // WARTOSCI DOMYSLNE zapisem atomowym - na dysku nigdy nie ma pustego pliku, a drugi start czyta normalnie.
+        // Best-effort: gdy zapis sie nie uda (dysk/uprawnienia), dziala sie jak dotad - defaulty w pamieci,
+        // a plik utworzy pierwszy udany zapis ustawien.
+        ObjectType defaults = Activator.CreateInstance<ObjectType>();
+        try {
+            JSONFilesManager.WriteObjectToJSONFile(JSONFullFilePath, defaults!);
+        } catch {
+            try { Directory.CreateDirectory(Path.GetDirectoryName(JSONFullFilePath)!); } catch { }
+        }
+        return defaults;
     }
 
     private static bool IsEmptyFile(string path) {
