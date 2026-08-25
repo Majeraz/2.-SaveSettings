@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Reflection;
 
@@ -23,10 +23,16 @@ namespace JSONFilesManagerProj;
 /// AppDomain.CurrentDomain.GetAssemblies()) - powierzchnia jest WEZSZA niz domyslnego bindera,
 /// ktory potrafi doladowac assembly po nazwie.
 ///
-/// ZAPIS (BindToName) zostaje domyslny - nowe pliki dostaja AKTUALNA nazwe assembly, wiec sam plik
-/// "naprawia sie" przy pierwszym zapisie. Uwaga: starszy build aplikacji (bez tego bindera) nie odczyta
-/// pliku zapisanego przez nowszy - rollback wersji aplikacji oznacza reset ustawien (akceptowane;
-/// aktualizacje Velopack sa w praktyce jednokierunkowe).
+/// ZAPIS (BindToName) - [ZMIANA 2026-08-25, obserwacja z maszyny dev, nie teoria]: dla typow przeniesionych
+/// do nowej biblioteki emitujemy STARA nazwe assembly (mapa LegacyAssemblyNames), nie aktualna. Powod: plik
+/// zapisany z nowa nazwa ("UserModel, DXFManagerBackend") wywracal STARSZY build (4.2.13) TWARDYM CRASHEM na
+/// starcie - bez okna i bez komunikatu (unhandled JsonSerializationException w SettingsManager.GetSetting;
+/// 4 proby uruchomienia z pulpitu = 4 wpisy APPCRASH w dzienniku zdarzen Windows). Wczesniejsze zalozenie
+/// "starszy build nie odczyta = reset ustawien (akceptowane)" bylo bledne: starsze buildy NIE MAJA
+/// LoadWithRecovery, wiec zamiast resetu jest smierc procesu - a aplikacja ma mechanizm cofania wersji po
+/// nieudanym starcie, czyli rollback prowadzil klienta w martwy punkt. Po tej zmianie plik jest czytelny
+/// W OBIE STRONY: stary build znajduje typ pod stara nazwa (u niego klasa naprawde tam lezy), a nowy build
+/// czyta go fallbackiem z BindToType wyzej - ta sama sciezka, ktora i tak obsluguje pliki sprzed ekstrakcji.
 /// </summary>
 public sealed class AssemblyAgnosticSerializationBinder : DefaultSerializationBinder {
 
@@ -59,6 +65,47 @@ public sealed class AssemblyAgnosticSerializationBinder : DefaultSerializationBi
         throw new JsonSerializationException(
             $"Nie znaleziono typu '{typeName}' (zapisane assembly: '{assemblyName}') w zadnym zaladowanym assembly. " +
             "Typ zostal usuniety/przemianowany albo biblioteka z nim nie jest zaladowana.");
+    }
+
+    /// <summary>
+    /// [Wsteczna zgodnosc zapisu 2026-08-25] Assembly, ktorych typy przeniosla ekstrakcja backendu (E2)
+    /// -> nazwa assembly, pod ktora te same typy zna KAZDY starszy build. Kazda kolejna ekstrakcja
+    /// biblioteki z exe MUSI dopisac tu swoj wpis - inaczej starsze buildy przestana czytac wspolne pliki
+    /// ustawien, i to nie resetem, tylko crashem na starcie (patrz komentarz klasy).
+    /// </summary>
+    private static readonly Dictionary<string, string> LegacyAssemblyNames = new() {
+        ["DXFManagerBackend"] = "DXF Manager",
+    };
+
+    /// <summary>
+    /// ZAPIS: typ przeniesiony do nowej biblioteki dostaje w JSON STARA nazwe assembly - patrz komentarz
+    /// klasy. Nazwy pozostalych assembly zostaja bez zmian.
+    /// </summary>
+    public override void BindToName(Type serializedType, out string? assemblyName, out string? typeName) {
+        base.BindToName(serializedType, out assemblyName, out typeName);
+        assemblyName = RewriteToLegacyAssemblyName(assemblyName);
+        // Typy generyczne (List<UserModel> itp.) maja nazwy assembly argumentow ZAGNIEZDZONE w typeName
+        // ("List`1[[UserModel, DXFManagerBackend, ...]]") - sama podmiana assemblyName by ich nie objela.
+        typeName = RewriteGenericArgumentAssemblies(typeName);
+    }
+
+    private static string? RewriteToLegacyAssemblyName(string? assemblyName) {
+        if (assemblyName is null) return null;
+        int comma = assemblyName.IndexOf(',');
+        string simpleName = (comma < 0 ? assemblyName : assemblyName[..comma]).Trim();
+        // Zwracamy sama prosta nazwe (bez Version/Culture) - dokladnie w tej formie stare pliki zapisywaly
+        // assembly i dokladnie te forme rozumie kazdy build.
+        return LegacyAssemblyNames.TryGetValue(simpleName, out string? legacyName) ? legacyName : assemblyName;
+    }
+
+    private static string? RewriteGenericArgumentAssemblies(string? typeName) {
+        if (typeName is null || !typeName.Contains('[')) return typeName;
+        foreach ((string movedAssembly, string legacyAssembly) in LegacyAssemblyNames) {
+            typeName = typeName
+                .Replace(", " + movedAssembly + ",", ", " + legacyAssembly + ",")
+                .Replace(", " + movedAssembly + "]", ", " + legacyAssembly + "]");
+        }
+        return typeName;
     }
 
     /// <summary>Assembly o tej nazwie sposrod JUZ zaladowanych (bez ladowania z dysku). null = nieznalezione

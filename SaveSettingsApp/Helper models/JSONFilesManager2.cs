@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace JSONFilesManagerProj;
 /// <summary>
@@ -11,7 +11,9 @@ public static class JSONFilesManager {
     /// TypeNameHandling.All jak dotad + <see cref="AssemblyAgnosticSerializationBinder"/>: odczyt znajduje
     /// typ po pelnej nazwie takze wtedy, gdy klasa przeniosla sie do innej biblioteki (ekstrakcja E2:
     /// "UserModel, DXF Manager" -> assembly DXFManagerBackend). Bez bindera taki plik = "uszkodzony"
-    /// i reset ustawien u kazdego klienta po aktualizacji. Zapis dostaje AKTUALNE nazwy assembly.
+    /// i reset ustawien u kazdego klienta po aktualizacji. Zapis [2026-08-25] emituje dla przeniesionych
+    /// typow STARA nazwe assembly (BindToName w binderze) - plik czytelny takze dla starszych buildow,
+    /// ktore biblioteki DXFManagerBackend nie maja (bez tego staly build ginal na starcie, nie resetowal).
     /// </summary>
     private static JsonSerializerSettings CreateSerializerSettings() => new() {
         TypeNameHandling = TypeNameHandling.All,
