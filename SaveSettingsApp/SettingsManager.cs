@@ -22,6 +22,15 @@ public enum SettingsLoadOutcome {
 }
 
 /// <summary>
+/// [Testy E2E 2026-09-23] Szew GRANICY dysku: katalog główny plików ustawień. Default null = produkcja bez zmian
+/// (<c>%ProgramData%\DXFManager</c>). Test ustawia katalog tymczasowy, żeby program czytał/zapisywał ustawienia jak
+/// na świeżej instalacji, NIE dotykając ustawień prawdziwej aplikacji na maszynie.
+/// </summary>
+public static class SettingsStorage {
+    public static string? TestRootOverride { get; set; }
+}
+
+/// <summary>
 /// Get acces to JSON File at specified related file path (if it doesn't exist yet it is becoming created).
 /// Gives methods to manipulate settings files.
 /// </summary>
@@ -41,7 +50,8 @@ public class SettingsManager<ObjectType> {
     public string? LoadFailureReason { get; private set; }
 
     public SettingsManager(string JSONFileRelativePath, ref ObjectType? originalObject) {
-        string appDataRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DXFManager");
+        string appDataRoot = SettingsStorage.TestRootOverride
+            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DXFManager");
         Directory.CreateDirectory(appDataRoot);
 
         JSONFullFilePath = Path.Combine(appDataRoot, JSONFileRelativePath);
